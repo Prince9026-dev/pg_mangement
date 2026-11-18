@@ -45,6 +45,11 @@ public:
     {
         phone = newNumber;
     }
+
+    int updateRoomN(int rn)
+    {
+        return roomNo = rn;
+    }
 };
 
 int Tenant::nextId = 1001;
@@ -93,6 +98,7 @@ public:
     {
         return capacity - occupiedBed;
     }
+
 
     bool addTenant()
     {
@@ -284,11 +290,88 @@ public:
             {
                 cout << "Room does not exist! " << endl;
             }
-            tenants.erase(id);
         }
         else
         {
             cout << "Tenant not find";
+        }
+    }
+
+    void updateTenantRoom(int tenantId, int roomn)
+    {
+        // 1. Find tenant
+        auto id = tenants.find(tenantId);
+        if (id != tenants.end())
+        {
+            cout << "found" << endl;
+            int oldRoomNo = id->second.getRoomNo();
+            auto newRoomN = rooms.find(roomn);
+            
+            if (newRoomN == rooms.end())
+            {
+                cout << "Room does not exist!" << endl;
+            }
+            else if (oldRoomNo == roomn)
+            {
+                cout << "You are already inside this room!" << endl;
+            }
+            else if (newRoomN->second.getAvailablebed() <= 0)
+            {
+                cout << "Room is full!" << endl;
+            }
+            else
+            {
+                cout << "Room is available!" << endl;
+                auto rmn = rooms.find(oldRoomNo);
+                rmn->second.removeTenant();
+                newRoomN->second.addTenant();
+                id->second.updateRoomN(roomn);
+            }
+        }
+    }
+
+    void searchTenant(int tenantId)
+    {
+        auto id = tenants.find(tenantId);
+        if (id != tenants.end())
+        {
+            cout << "Tenant found :- " << endl;
+            cout << "TENANT ID :- " << tenantId << endl;
+            cout << "TENANT NAME IS :- " << id->second.getname() << endl;
+            cout << "TENANT PHONE NUMBER :- " << id->second.getphone() << endl;
+            cout << "TENANT ROOM NUMBER :- " << id->second.getRoomNo() << endl;
+
+            int c;
+            do
+            {
+                cout << "1. for Update Phone Number :- " << endl;
+                cout << "2. for Update Room Number :- " << endl;
+                cout << "0. for exit" << endl;
+                cout << "what do you want to update? ";
+                cin >> c;
+
+                switch (c){
+                    case 1:{
+                        string phone;
+                        cout << "enter New Phone No. :- " << endl;
+                        cin >> phone;
+                        id->second.updatePhoneN(phone);
+                        break;
+                    }
+                    case 2:{
+                        int roomn;
+                        cout << "Enter your new room no. :- " << endl;
+                        cin >> roomn;
+                        updateTenantRoom(tenantId, roomn);
+                        break;
+                    }
+                }
+
+            } while (c != 0);
+        }
+        else
+        {
+            cout << "TENANT Not Found!" << endl;
         }
     }
 };
@@ -328,11 +411,15 @@ int main()
 
             cout << "\n1. Add Tenant";
             cout << "\n2. Remove Tenant";
+            cout<<"\n3. update tenant info";
+            cout<<"\n 0. for exit";
             cout << "\nEnter your choice: ";
             cin >> c;
 
             switch (c)
             {
+                case 0 : break;
+
             case 1:
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -362,6 +449,12 @@ int main()
                 break;
             }
 
+            case 3:{
+                int id;
+                cout<<"Enter tenant id :- ";
+                cin>>id;
+                pg.searchTenant(id);
+            }
             default:
                 cout << "Invalid choice!" << endl;
             }
