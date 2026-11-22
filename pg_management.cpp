@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include <map>
 #include <limits>
 
@@ -123,6 +124,99 @@ public:
     }
 };
 
+// -------payment structure--------
+class PaymentTransaction{
+    static int nextTransactionId;
+
+    int transactionId;
+    double transactionAmount;
+    string date;
+    string transactionMethod;
+public:
+    PaymentTransaction(int tA, string dT, string tM) {
+        transactionId = ++nextTransactionId;
+        transactionAmount = tA;
+        date = dT;
+        transactionMethod = tM;
+    }
+
+    int getTransactionId() const { return transactionId;}
+    double  getTransactionAmount() const {return transactionAmount;}
+    string getDate() const {return date;}
+    string getTransactionMethod() const{ return transactionMethod;}
+    
+};
+
+int PaymentTransaction :: nextTransactionId = 0;
+
+
+class RentRecord{
+    int tenantId;
+    string startDate;
+    string endDate;
+    string dueDate;
+    double totalRent;
+    vector<PaymentTransaction> transactions;
+    string status;
+public:
+    RentRecord(int tid, string sd, string ed, string dd, double tr, string st="pending"){
+        tenantId = tid;
+        startDate = sd;
+        endDate = ed;
+        dueDate = dd;
+        totalRent = tr;
+        status = st;
+        
+    }
+    int getTenantId() const{return tenantId;}
+    string getStartDate() const {return startDate;}
+    string getEndDate() const {return endDate;}
+    string getDueDate() const {return dueDate;}
+    double getTotalRent() const {return totalRent;}
+    string getStatus() const{return status;}
+
+    void addPayment(PaymentTransaction payment) {
+        transactions.push_back(payment);
+    }
+
+    double getTotalPaid() const {
+        double totalAmount = 0;
+
+        for (const auto& transaction : transactions) {
+            totalAmount += transaction.getTransactionAmount();
+        }
+
+        return totalAmount;
+    }   
+
+    double getRemainingAmount(){
+        double totalTransaction = getTotalPaid();
+        double remainingAmount = getTotalRent() - totalTransaction;
+        return remainingAmount;
+    }
+
+    void updateStatus() {
+        if (getRemainingAmount() <= 0) {
+            status = "Paid";
+        }
+        else if (getTotalPaid() > 0) {
+            status = "Partial";
+        }
+        else {
+            status = "Pending";
+        }
+    }
+    void displayPaymentHistory() const {
+        // Display all transactions
+        cout << "PAYMENT HISTORY" << endl;
+        for (const auto& transaction : transactions) {
+            cout<<"Transaction ID: "<<transaction.getTransactionId()<<endl;
+            cout<<"Amount: "<<transaction.getTransactionAmount()<<endl;
+            cout<<"Date: "<<transaction.getDate()<<endl;
+            cout<<"Method"<<transaction.getTransactionMethod()<<endl;
+        }
+    }
+};
 // ================= PG MANAGEMENT CLASS =================
 
 class PgManage
@@ -376,6 +470,8 @@ public:
     }
 };
 
+
+
 // ================= MAIN FUNCTION =================
 
 int main()
@@ -395,80 +491,92 @@ int main()
     int roomNo;
     int choice;
 
+    PaymentTransaction p(2000, "01/12/2026", "cash");
+    p.getDate();
+    p.getTransactionAmount();
+    p.getTransactionId();
+    p.getTransactionMethod();
+    PaymentTransaction p1(2000, "2026-11-20", "Cash");
+    PaymentTransaction p2(3000, "2026-11-21", "UPI");
+    PaymentTransaction p3(1500, "2026-11-22", "Bank Transfer");
+    cout << "Transaction ID: " << p1.getTransactionId() << endl;
+    cout << "Amount: " << p1.getTransactionAmount() << endl;
+    cout << "Date: " << p1.getDate() << endl;
+    cout << "Method: " << p1.getTransactionMethod() << endl;
     // Collect tenant details
-    do
-    {
-        cout << "\n1. Yes";
-        cout << "\n2. No";
-        cout << "\nDo you want to continue? ";
-        cin >> choice;
+    // do
+    // {
+    //     cout << "\n1. Yes";
+    //     cout << "\n2. No";
+    //     cout << "\nDo you want to continue? ";
+    //     cin >> choice;
 
-        switch (choice)
-        {
-        case 1:
-        {
-            int c;
+    //     switch (choice)
+    //     {
+    //     case 1:
+    //     {
+    //         int c;
 
-            cout << "\n1. Add Tenant";
-            cout << "\n2. Remove Tenant";
-            cout<<"\n3. update tenant info";
-            cout<<"\n 0. for exit";
-            cout << "\nEnter your choice: ";
-            cin >> c;
+    //         cout << "\n1. Add Tenant";
+    //         cout << "\n2. Remove Tenant";
+    //         cout<<"\n3. update tenant info";
+    //         cout<<"\n 0. for exit";
+    //         cout << "\nEnter your choice: ";
+    //         cin >> c;
 
-            switch (c)
-            {
-                case 0 : break;
+    //         switch (c)
+    //         {
+    //             case 0 : break;
 
-            case 1:
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    //         case 1:
+    //             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-                cout << "Enter your name: ";
-                getline(cin, name);
+    //             cout << "Enter your name: ";
+    //             getline(cin, name);
 
-                cout << "Enter your phone number: ";
-                getline(cin, phone);
+    //             cout << "Enter your phone number: ";
+    //             getline(cin, phone);
 
-                pg.displayAvailableRooms();
+    //             pg.displayAvailableRooms();
 
-                cout << "Enter room number: ";
-                cin >> roomNo;
+    //             cout << "Enter room number: ";
+    //             cin >> roomNo;
 
-                pg.addTenant(name, phone, roomNo);
-                pg.displayTenants();
-                break;
+    //             pg.addTenant(name, phone, roomNo);
+    //             pg.displayTenants();
+    //             break;
 
-            case 2:
-            {
-                int tenantId;
-                cout << "Enter tenant ID: ";
-                cin >> tenantId;
+    //         case 2:
+    //         {
+    //             int tenantId;
+    //             cout << "Enter tenant ID: ";
+    //             cin >> tenantId;
 
-                pg.checkoutTenant(tenantId);
-                pg.displayTenants();
-                break;
-            }
+    //             pg.checkoutTenant(tenantId);
+    //             pg.displayTenants();
+    //             break;
+    //         }
 
-            case 3:{
-                int id;
-                cout<<"Enter tenant id :- ";
-                cin>>id;
-                pg.searchTenant(id);
-            }
-            default:
-                cout << "Invalid choice!" << endl;
-            }
-            break;
-        }
+    //         case 3:{
+    //             int id;
+    //             cout<<"Enter tenant id :- ";
+    //             cin>>id;
+    //             pg.searchTenant(id);
+    //         }
+    //         default:
+    //             cout << "Invalid choice!" << endl;
+    //         }
+    //         break;
+    //     }
 
-        case 2:
-            cout << "Exiting program." << endl;
-            break;
+    //     case 2:
+    //         cout << "Exiting program." << endl;
+    //         break;
 
-        default:
-            cout << "Invalid choice!" << endl;
-        }
+    //     default:
+    //         cout << "Invalid choice!" << endl;
+    //     }
 
-    } while (choice != 2);
+    // } while (choice != 2);
     return 0;
 }
