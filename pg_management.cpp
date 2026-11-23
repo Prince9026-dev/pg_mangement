@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <limits>
+#include <algorithm>
 
 using namespace std;
 
@@ -177,6 +178,7 @@ public:
 
     void addPayment(PaymentTransaction payment) {
         transactions.push_back(payment);
+        updateStatus();
     }
 
     double getTotalPaid() const {
@@ -215,6 +217,9 @@ public:
             cout<<"Date: "<<transaction.getDate()<<endl;
             cout<<"Method"<<transaction.getTransactionMethod()<<endl;
         }
+        cout<<"Total Paid: "<<getTotalPaid()<<endl;
+        cout<<"Remaining Amount: "<<endl;
+        cout<<"Current Status: "<<getStatus()<<endl;
     }
 };
 // ================= PG MANAGEMENT CLASS =================
@@ -474,35 +479,35 @@ public:
 
 // ================= MAIN FUNCTION =================
 
-int main()
-{
+// int main()
+// {
 
-    PgManage pg;
+//     PgManage pg;
 
-    // Owner adds rooms
-    pg.addRoom(101, "double", 4000, 2);
-    pg.addRoom(102, "single", 7000, 1);
-    pg.addRoom(103, "triple", 3500, 3);
+//     // Owner adds rooms
+//     pg.addRoom(101, "double", 4000, 2);
+//     pg.addRoom(102, "single", 7000, 1);
+//     pg.addRoom(103, "triple", 3500, 3);
 
-    cout << "\n===== PG MANAGEMENT SYSTEM =====\n";
+//     cout << "\n===== PG MANAGEMENT SYSTEM =====\n";
 
-    string name;
-    string phone;
-    int roomNo;
-    int choice;
+//     string name;
+//     string phone;
+//     int roomNo;
+//     int choice;
 
-    PaymentTransaction p(2000, "01/12/2026", "cash");
-    p.getDate();
-    p.getTransactionAmount();
-    p.getTransactionId();
-    p.getTransactionMethod();
-    PaymentTransaction p1(2000, "2026-11-20", "Cash");
-    PaymentTransaction p2(3000, "2026-11-21", "UPI");
-    PaymentTransaction p3(1500, "2026-11-22", "Bank Transfer");
-    cout << "Transaction ID: " << p1.getTransactionId() << endl;
-    cout << "Amount: " << p1.getTransactionAmount() << endl;
-    cout << "Date: " << p1.getDate() << endl;
-    cout << "Method: " << p1.getTransactionMethod() << endl;
+//     PaymentTransaction p(2000, "01/12/2026", "cash");
+//     p.getDate();
+//     p.getTransactionAmount();
+//     p.getTransactionId();
+//     p.getTransactionMethod();
+//     PaymentTransaction p1(2000, "2026-11-20", "Cash");
+//     PaymentTransaction p2(3000, "2026-11-21", "UPI");
+//     PaymentTransaction p3(1500, "2026-11-22", "Bank Transfer");
+//     cout << "Transaction ID: " << p1.getTransactionId() << endl;
+//     cout << "Amount: " << p1.getTransactionAmount() << endl;
+//     cout << "Date: " << p1.getDate() << endl;
+//     cout << "Method: " << p1.getTransactionMethod() << endl;
     // Collect tenant details
     // do
     // {
@@ -578,5 +583,31 @@ int main()
     //     }
 
     // } while (choice != 2);
+    // return 0;
+// }
+int main() {
+
+    // 1. Create rent record
+    RentRecord rent(101, "2026-11-15","2026-12-14", "2026-11-15", 8000);
+
+    // 2. Create payment transactions
+    PaymentTransaction p1(2000, "2026-11-20", "UPI");
+    PaymentTransaction p2(3000, "2026-11-21", "Cash");
+
+    // 3. Add payments to rent record
+    rent.addPayment(p1);
+    rent.addPayment(p2);
+
+    // 4. Update status
+    rent.updateStatus();
+
+    // 5. Display calculations
+    cout << "Total Paid: " << rent.getTotalPaid() << endl;
+    cout << "Remaining: " << rent.getRemainingAmount() << endl;
+    cout << "Status: " << rent.getStatus() << endl;
+
+    // 6. Display payment history
+    rent.displayPaymentHistory();
+
     return 0;
 }
